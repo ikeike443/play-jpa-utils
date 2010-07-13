@@ -1,0 +1,4 @@
+It contains:
+
+  MyJPAModel : support for recording create/update datetime and making disable function instead of deleting.
+  Unique     : Unique constraint annotation. Original from playframework ML, a little bit modified.
