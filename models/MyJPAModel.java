@@ -14,9 +14,11 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.hibernate.QueryException;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+import play.data.validation.Validation;
 import play.db.jpa.JPA;
 import play.db.jpa.JPASupport;
 
@@ -47,6 +49,12 @@ public abstract class MyJPAModel extends JPASupport {
 	 */
 	@Override
 	public <T extends JPASupport> T save(){
+		Validation validation = Validation.current();
+        validation.valid(this);
+        if (validation.hasErrors()) {
+            throw new RuntimeException("Validation ERROR!! "+validation.errors());
+        }
+		
 		Date nowDateTime =  new DateTime().toDate();
 		this.createDateTime = (this.createDateTime==null)? nowDateTime : this.createDateTime;
 		this.updateDateTime = nowDateTime;	
