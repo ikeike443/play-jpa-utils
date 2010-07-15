@@ -18,6 +18,7 @@ import org.hibernate.QueryException;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+import play.Logger;
 import play.data.validation.Validation;
 import play.db.jpa.JPA;
 import play.db.jpa.JPASupport;
@@ -73,6 +74,25 @@ public abstract class MyJPAModel extends JPASupport {
 	public <T extends JPASupport> T disable(){
 		this.status = 1;
 		return this.save();
+	}
+	
+	/**
+	 * DBの項目長に合わせてStringをカットする
+	 * @param label
+	 * @param column
+	 * @return
+	 */
+	protected String adjustLength(String label, String column){
+		try {
+			int maxLength = this.getClass().getField(label).getAnnotation(Column.class).length();
+			return column.length()> maxLength? column.substring(0, maxLength) : column;
+		} catch (SecurityException e) {
+			Logger.warn(e,"Error at MyJPAModel#adjustLength param are %s, %s", label,column);
+			return column;
+		} catch (NoSuchFieldException e) {
+			Logger.warn(e,"Error at MyJPAModel#adjustLength param are %s, %s", label,column);
+			return column;
+		}
 	}
 	
 	@Override
